@@ -81,7 +81,11 @@ func (s Set) Format(state fmt.State, _ rune) {
 // RangeBy returns a SetIterator for the Set that iterates over the elements in
 // a specified order.
 func (s Set) RangeBy(less func(a, b interface{}) bool) Iterator {
-	return s.root.orderedIterator(less, s.Count())
+	return s.root.orderedIteratorN(less, s.Count())
+}
+
+func (s Set) OrderedRangeN(n int, less func(a, b interface{}) bool) Iterator {
+	return s.root.orderedIteratorN(less, n)
 }
 
 // Hash computes a hash value for s.

@@ -40,12 +40,12 @@ func (i *nodeIter) Value() interface{} {
 	return i.li.Value()
 }
 
-func (n *node) orderedIterator(less func(a, b interface{}) bool, capacity int) *ordered {
+func (n *node) orderedIteratorN(less func(a, b interface{}) bool, capacity int) *ordered {
 	o := &ordered{less: less, elems: make([]interface{}, 0, capacity)}
 	for i := n.iterator(); i.Next(); {
 		heap.Push(o, i.Value())
 	}
-	return o
+	return &ordered{less: less, elems: }
 }
 
 type ordered struct {
@@ -71,7 +71,7 @@ func (o *ordered) Len() int {
 }
 
 func (o *ordered) Less(i, j int) bool {
-	return o.less(o.elems[i], o.elems[j])
+	return !o.less(o.elems[i], o.elems[j])
 }
 
 func (o *ordered) Swap(i, j int) {
@@ -79,7 +79,11 @@ func (o *ordered) Swap(i, j int) {
 }
 
 func (o *ordered) Push(x interface{}) {
-	o.elems = append(o.elems, x)
+	if len(o.elems) < cap(o.elems) {
+		o.elems = append(o.elems, x)
+	} else if o.less(x, o.elems[0]) {
+		o.elems[0] = x
+	}
 }
 
 func (o *ordered) Pop() interface{} {

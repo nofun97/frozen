@@ -431,6 +431,23 @@ func TestSetRangeBy(t *testing.T) {
 	assert.Equal(t, []int{9, 8, 7, 6, 5, 4, 3, 2, 1, 0}, output)
 }
 
+func TestOrderedRangeN(t *testing.T) {
+	t.Parallel()
+
+	output := []int{}
+	less := func(a, b interface{}) bool { return a.(int) < b.(int) }
+	for i := Iota(10).OrderedRangeN(10, less); i.Next(); {
+		output = append(output, i.Value().(int))
+	}
+	assert.Equal(t, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, output)
+
+	output = output[:0]
+	for i := Iota(10).OrderedRangeN(5, less); i.Next(); {
+		output = append(output, i.Value().(int))
+	}
+	assert.Equal(t, []int{0, 1, 2, 3, 4}, output)
+}
+
 var prepopSetInt = memoizePrepop(func(n int) interface{} {
 	m := make(map[int]struct{}, n)
 	for i := 0; i < n; i++ {
